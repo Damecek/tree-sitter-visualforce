@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<apex:page controller="AccountDashboardController" showHeader="false" sidebar="false">
+  <!-- Representative Visualforce page used for scanner and query regression tests. -->
+  <html lang="en">
+    <head>
+      <title>Accounts for {!HTMLENCODE($User.FirstName)}</title>
+      <style>
+        :root { --brand: {!theme.primary}; --spacing: 12px; }
+        .dashboard > .account-card { color: var(--brand); }
+        .hero { background: url('{!URLFOR($Resource.assets, "images/hero{2}.png")}'); }
+      </style>
+    </head>
+    <body class="dashboard {!IF(compact = true, 'compact', 'wide')}">
+      <apex:form id="accountForm">
+        <apex:pageBlock title="Welcome {!$User.FirstName}">
+          <apex:pageMessages/>
+          <apex:repeat value="{!accounts}" var="account">
+            <article class="account-card" data-id="{!account.Id}" style="border-color: {!theme.border};">
+              <h2>{!HTMLENCODE(account.Name)}</h2>
+              <p>Owner: {!account.Owner.Name} &amp; status: {!account.Status__c}</p>
+              <c:statusBadge state="{!account.Status__c}"/>
+              <pkg:managedWidget recordId="{!account.Id}" mode=compact />
+              <button type="button" onclick="selectAccount('{!JSENCODE(account.Id)}'); return false;">
+                Select
+              </button>
+            </article>
+          </apex:repeat>
+        </apex:pageBlock>
+      </apex:form>
+      <script>
+        const currentUser = '{!JSENCODE($User.Id)}';
+        const assetUrl = '{!URLFOR($Resource.assets, "app/main.js")}';
+        const thresholdReached = {!total >= 10 AND total < 100};
+        if (thresholdReached && currentUser.length > 0) {
+          window.dashboard = { currentUser, assetUrl };
+        }
+      </script>
+      <footer>Rendered {!IF(total = null, 'no data', IF(total = 1, 'one account', total & ' accounts'))}.</footer>
+    </body>
+  </html>
+</apex:page>

@@ -1,0 +1,8 @@
+<apex:component access="global">
+  <apex:attribute name="record" type="Account" required="true"/>
+  <section class="account-card">
+    <c:statusBadge state="{!record.Status__c}"/>
+    <pkg:managedWidget recordId="{!record.Id}"/>
+  </section>
+</apex:component>
+

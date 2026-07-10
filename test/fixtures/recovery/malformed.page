@@ -1,0 +1,5 @@
+<apex:page>
+  <section><span>Broken nesting</section>
+  <footer>After malformed region</footer>
+</apex:page>
+

@@ -1,0 +1,4 @@
+<apex:page>
+  <h1>{!account.Name}</h1>
+  {!IF(account.Active__c, 'Active'
+

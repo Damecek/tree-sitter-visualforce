@@ -1,0 +1,20 @@
+<apex:page controller="AccountController">
+  <style>
+    .account-card { color: {!theme.primary}; }
+    .account-card > .name { background-image: url('{!URLFOR($Resource.assets, "card{2}.png")}'); }
+  </style>
+  <button
+    style="border-color: {!theme.border};"
+    onclick="openAccount('{!JSENCODE(account.Id)}', {!account.Active__c});">
+    Open
+  </button>
+  <script>
+    const accountName = '{!JSENCODE(account.Name)}';
+    const hasCredit = {!account.Credit__c >= 1000};
+    if (hasCredit && accountName.length > 0) {
+      window.renderAccount(accountName);
+    }
+  </script>
+  <footer>Embedded content ended</footer>
+</apex:page>
+

@@ -6,12 +6,19 @@
       "camelcase": "Visualforce",
       "title": "Visualforce",
       "scope": "source.visualforce",
+      "path": ".",
+      "external-files": [
+        "src/tag.h"
+      ],
       "file-types": [
         "component",
         "page"
       ],
       "injection-regex": "^visualforce$",
-      "class-name": "TreeSitterVisualforce"
+      "class-name": "TreeSitterVisualforce",
+      "highlights": "queries/highlights.scm",
+      "injections": "queries/injections.scm",
+      "indents": "queries/indents.scm"
     }
   ],
   "metadata": {
