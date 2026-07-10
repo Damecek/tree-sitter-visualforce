@@ -22,7 +22,7 @@ const PREC = {
   MEMBER: 10,
 };
 
-const binary = (precedence, operator) => $ =>
+const binary = (precedence, operator) => ($) =>
   prec.left(
     precedence,
     seq(
@@ -43,13 +43,13 @@ module.exports = grammar(HTML, {
     ]),
 
   rules: {
-    document: $ => repeat(choice($.xml_declaration, $._node)),
+    document: ($) => repeat(choice($.xml_declaration, $._node)),
 
-    xml_declaration: $ => seq('<?xml', repeat($.attribute), '?>'),
+    xml_declaration: ($) => seq('<?xml', repeat($.attribute), '?>'),
 
     _node: ($, original) => choice(prec(1, $.visualforce_expression), original),
 
-    start_tag: $ =>
+    start_tag: ($) =>
       seq(
         '<',
         alias($._start_tag_name, $.tag_name),
@@ -57,23 +57,23 @@ module.exports = grammar(HTML, {
         choice('>', $._missing_start_tag_end),
       ),
 
-    script_element: $ =>
+    script_element: ($) =>
       seq(
         alias($.script_start_tag, $.start_tag),
         repeat(choice($.raw_text, $.visualforce_expression)),
         $.end_tag,
       ),
 
-    style_element: $ =>
+    style_element: ($) =>
       seq(
         alias($.style_start_tag, $.start_tag),
         repeat(choice($.raw_text, $.visualforce_expression)),
         $.end_tag,
       ),
 
-    text: _ => /[^<>&{\s]([^<>&{]*[^<>&{\s])?/,
+    text: (_) => /[^<>&{\s]([^<>&{]*[^<>&{\s])?/,
 
-    attribute_value: $ =>
+    attribute_value: ($) =>
       repeat1(
         choice(
           $.visualforce_expression,
@@ -83,10 +83,10 @@ module.exports = grammar(HTML, {
         ),
       ),
 
-    quoted_attribute_value: $ =>
+    quoted_attribute_value: ($) =>
       choice(
         seq(
-          "'",
+          '\u0027',
           repeat(
             choice(
               $.visualforce_expression,
@@ -94,7 +94,7 @@ module.exports = grammar(HTML, {
               alias(token.immediate(/[^'{&]+/), $.attribute_text),
             ),
           ),
-          "'",
+          '\u0027',
         ),
         seq(
           '"',
@@ -111,7 +111,7 @@ module.exports = grammar(HTML, {
 
     // Visualforce expression language. This is intentionally independent of
     // Apex: it models useful syntax without asserting runtime semantics.
-    visualforce_expression: $ =>
+    visualforce_expression: ($) =>
       seq(
         alias('{!', $.expression_start),
         $._expression,
@@ -121,7 +121,7 @@ module.exports = grammar(HTML, {
         ),
       ),
 
-    _expression: $ =>
+    _expression: ($) =>
       choice(
         $.binary_expression,
         $.unary_expression,
@@ -136,7 +136,7 @@ module.exports = grammar(HTML, {
         $.null_literal,
       ),
 
-    binary_expression: $ =>
+    binary_expression: ($) =>
       choice(
         binary(PREC.OR, choice('||', token(prec(1, /[Oo][Rr]/))))($),
         binary(PREC.AND, choice('&&', token(prec(1, /[Aa][Nn][Dd]/))))($),
@@ -147,19 +147,22 @@ module.exports = grammar(HTML, {
         binary(PREC.MULTIPLICATIVE, choice('*', '/'))($),
       ),
 
-    unary_expression: $ =>
+    unary_expression: ($) =>
       prec.right(
         PREC.UNARY,
         seq(
           field(
             'operator',
-            alias(choice('!', '+', '-', token(prec(1, /[Nn][Oo][Tt]/))), $.operator),
+            alias(
+              choice('!', '+', '-', token(prec(1, /[Nn][Oo][Tt]/))),
+              $.operator,
+            ),
           ),
           field('argument', $._expression),
         ),
       ),
 
-    call_expression: $ =>
+    call_expression: ($) =>
       prec.left(
         PREC.CALL,
         seq(
@@ -168,14 +171,14 @@ module.exports = grammar(HTML, {
         ),
       ),
 
-    argument_list: $ =>
+    argument_list: ($) =>
       seq(
         '(',
         optional(seq($._expression, repeat(seq(',', $._expression)))),
         ')',
       ),
 
-    member_expression: $ =>
+    member_expression: ($) =>
       prec.left(
         PREC.MEMBER,
         seq(
@@ -194,20 +197,19 @@ module.exports = grammar(HTML, {
         ),
       ),
 
-    parenthesized_expression: $ => seq('(', $._expression, ')'),
+    parenthesized_expression: ($) => seq('(', $._expression, ')'),
 
-    global_identifier: _ => /\$[A-Za-z_][A-Za-z0-9_]*/,
+    global_identifier: (_) => /\$[A-Za-z_][A-Za-z0-9_]*/,
 
-    identifier: _ => /[A-Za-z_][A-Za-z0-9_]*/,
+    identifier: (_) => /[A-Za-z_][A-Za-z0-9_]*/,
 
-    string_literal: _ =>
-      token(choice(/'([^'\\]|\\.)*'/, /"([^"\\]|\\.)*"/)),
+    string_literal: (_) => token(choice(/'([^'\\]|\\.)*'/, /"([^"\\]|\\.)*"/)),
 
-    number_literal: _ => /[0-9]+(\.[0-9]+)?/,
+    number_literal: (_) => /[0-9]+(\.[0-9]+)?/,
 
-    boolean_literal: _ =>
+    boolean_literal: (_) =>
       token(prec(2, choice(/[Tt][Rr][Uu][Ee]/, /[Ff][Aa][Ll][Ss][Ee]/))),
 
-    null_literal: _ => token(prec(2, /[Nn][Uu][Ll][Ll]/)),
+    null_literal: (_) => token(prec(2, /[Nn][Uu][Ll][Ll]/)),
   },
 });

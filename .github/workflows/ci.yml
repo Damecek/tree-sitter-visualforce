@@ -1,0 +1,43 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: Validate (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Install exact dependencies
+        run: npm ci
+      - name: Validate corpus, fixtures, queries, style, and metadata
+        run: npm test
+      - name: Build native parser
+        run: npm run build:native
+      - name: Build WASM parser
+        run: npm run build:wasm
+      - name: Exercise generated Rust binding
+        run: npm run test:binding
+      - name: Verify reproducible generation
+        run: npm run check:regenerate
+      - name: Run clean-clone consumer smoke test
+        if: runner.os == 'Linux'
+        run: npm run test:e2e

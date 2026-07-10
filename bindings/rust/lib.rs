@@ -56,5 +56,13 @@ mod tests {
         parser
             .set_language(&super::LANGUAGE.into())
             .expect("Error loading Visualforce parser");
+
+        let source = r#"<apex:page>{!$User.Name}</apex:page>"#;
+        let tree = parser.parse(source, None).expect("Visualforce parse failed");
+        assert!(!tree.root_node().has_error());
+        assert!(tree
+            .root_node()
+            .to_sexp()
+            .contains("visualforce_expression"));
     }
 }
