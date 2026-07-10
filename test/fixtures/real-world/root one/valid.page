@@ -1,0 +1,1 @@
+<apex:page><apex:outputText value="{0,date,dd/MM/yyyy}"/><apex:outputText value="{!records[index].Name}"/></apex:page>

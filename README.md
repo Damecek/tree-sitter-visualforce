@@ -11,11 +11,13 @@ The grammar is named `visualforce`. It extends [`tree-sitter-html` 0.23.2](https
 - Standard HTML and arbitrary namespaced tags, including `apex:*`, `c:*`, and managed-package components
 - `.page` and `.component` documents
 - Quoted, unquoted, expression-only, and mixed literal/expression attributes
+- Literal message-format braces in quoted attributes, including values such as `{0,date,dd/MM/yyyy}`
 - HTML comments, entities, doctype declarations, and XML declarations
 - `{! ... }` expressions in text and attributes
 - Expressions embedded in `<script>`, `<style>`, event-handler attributes, and `style` attributes
 - Identifiers, `$User`, `$Resource`, and other `$` globals
 - Chained member access, function calls, argument lists, and parentheses
+- Postfix subscripts after globals, members, calls, and other subscripts, with member access or calls after indexing
 - Single- and double-quoted strings with escapes, numbers, booleans, and null
 - Common unary, arithmetic, concatenation, comparison, equality, and logical operators
 - Formula-style calls such as `IF`, `JSENCODE`, `HTMLENCODE`, and `URLFOR`
@@ -51,11 +53,12 @@ The Visualforce fragments above become `visualforce_expression` nodes rather tha
 
 `grammar.js` uses Tree-sitter grammar inheritance instead of copying the HTML grammar. The external scanner and tag table are adapted from the exact pinned HTML release and retain its tag stack, custom-tag matching, implicit closes, void elements, comments, and case-insensitive script/style closing tags.
 
-The scanner has three narrowly scoped Visualforce/editor adaptations:
+The scanner has four narrowly scoped Visualforce/editor adaptations:
 
 1. Script and style raw text stops before `{!`, allowing the expression grammar to parse the fragment before raw scanning resumes.
 2. An expression may close synthetically only when nothing except whitespace remains at end of file.
 3. A partially typed start tag may synthesize its final `>` only at end of file, after which the inherited tag stack unwinds open elements.
+4. A partially typed subscript may synthesize its final `]` only at end of file.
 
 Comparison operators such as `<`, `>`, `<=`, and `>=` are parsed within expression state, so they do not corrupt the surrounding markup tree.
 
@@ -77,13 +80,13 @@ For Zed extension development:
 ```toml
 [grammars.visualforce]
 repository = "https://github.com/Damecek/tree-sitter-visualforce"
-rev = "v0.1.0"
+rev = "v0.1.1"
 ```
 
 For Node consumers before any npm publication:
 
 ```bash
-npm install tree-sitter@0.25.0 github:Damecek/tree-sitter-visualforce#v0.1.0
+npm install tree-sitter@0.25.0 github:Damecek/tree-sitter-visualforce#v0.1.1
 ```
 
 For Rust consumers:
@@ -91,7 +94,7 @@ For Rust consumers:
 ```toml
 [dependencies]
 tree-sitter = "0.26.10"
-tree-sitter-visualforce = { git = "https://github.com/Damecek/tree-sitter-visualforce", tag = "v0.1.0" }
+tree-sitter-visualforce = { git = "https://github.com/Damecek/tree-sitter-visualforce", tag = "v0.1.1" }
 ```
 
 Neovim, Helix, and Emacs integrations can point their Tree-sitter grammar source configuration at the same repository and tag, register the `page` and `component` file types, and install the queries from `queries/` according to the editor's normal parser packaging convention.
@@ -133,6 +136,23 @@ Run the consumer-style clean-clone validation:
 npm run test:e2e
 ```
 
+### Local real-world corpus
+
+The optional local harness recursively validates private or adjacent Visualforce repositories without publishing their contents. Copy `.visualforce-corpus.example.json` to the ignored `.visualforce-corpus.local.json`, replace the example roots with local paths, and establish the reviewed discovery counts:
+
+```bash
+npm run test:real:update-baseline
+npm run test:real
+```
+
+The harness builds the current local parser, discovers `.page` and `.component` files, skips common dependency/build directories and nested repositories or worktrees, hashes contents with SHA-256, and fails on any `ERROR` or missing node. It reports path-level and unique-content-level results, page/component counts, per-root counts, bytes, parser duration, failing ranges, and baseline drift. The machine-readable report is written under ignored `.build/`; source contents are never included.
+
+Use `includeDirectories` to opt a normally excluded directory name back into discovery, `includeNestedRepositories: true` to include nested repositories/worktrees deliberately, and `followSymbolicLinks: true` only when duplicate traversal is intended. Public CI exercises the harness with committed anonymized fixtures:
+
+```bash
+npm run test:real:harness
+```
+
 See [CONTRIBUTING.md](CONTRIBUTING.md) for the test-first workflow. The architecture decision and implementation plan are preserved under `docs/superpowers/`.
 
 ## Known limitations
@@ -140,6 +160,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for the test-first workflow. The architec
 - This grammar provides structural syntax, highlighting, injections, and recovery. It does not validate Salesforce runtime semantics, controller members, component attributes, permissions, or formula function signatures.
 - Visualforce expressions are related to Salesforce formula syntax but are not Apex. The grammar neither embeds nor injects an Apex parser.
 - The expression grammar intentionally covers documented/common structural forms. Runtime-specific or undocumented constructs outside that surface recover locally and may contain `ERROR` nodes.
+- Subscript nodes describe Visualforce expression structure only; they do not imply Apex parsing or runtime validation of index types.
 - JavaScript and CSS remain `raw_text` in the base tree and become language trees through injection queries. Expression fragments split the injected content into ranges.
 - Namespaced tag prefixes are not separate syntax nodes because the inherited HTML tag-balancing scanner emits the complete tag name as one token.
 - EOF-only synthetic delimiters improve editor behavior but do not attempt to reinterpret arbitrary mid-document malformed expressions as valid syntax.

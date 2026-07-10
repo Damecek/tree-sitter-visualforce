@@ -21,6 +21,22 @@ The project pins `tree-sitter-cli` to 0.26.10 and `tree-sitter-html` to 0.23.2. 
 
 Do not use `tree-sitter test --update` as a substitute for reviewing expected trees. Valid fixtures under `test/fixtures/valid/` must not contain `ERROR` or missing nodes. Invalid editor states belong in dedicated recovery cases with assertions that later markup remains available.
 
+## Real-world corpus validation
+
+`npm run test:real:harness` validates the reusable harness against committed anonymized fixtures and is part of `npm test`. If you have local Visualforce repositories, copy `.visualforce-corpus.example.json` to the ignored `.visualforce-corpus.local.json` and configure named roots. Then run:
+
+```bash
+npm run test:real
+```
+
+The command is strict: every discovered `.page` and `.component` must parse without `ERROR` or missing nodes. It also checks the configured path and unique-content baseline so repository drift is visible. After reviewing an intentional discovery-count change and confirming that all files pass, update only those counts with:
+
+```bash
+npm run test:real:update-baseline
+```
+
+Do not add an allowlist to hide parser failures. Never commit `.visualforce-corpus.local.json`, `.build/` reports, absolute local paths, or source files copied from private/customer repositories. Public regressions must be minimized and anonymized.
+
 ## Scanner changes
 
 `src/scanner.c` and `src/tag.h` derive from `tree-sitter-html@0.23.2`. Keep their attribution intact. Scanner changes require corpus coverage for serialization-sensitive nesting, matching end tags, script/style boundaries, and partially typed input.
@@ -29,6 +45,7 @@ Do not use `tree-sitter test --update` as a substitute for reviewing expected tr
 
 ```bash
 npm test
+npm run test:real:harness
 npm run build:native
 npm run build:wasm
 npm run test:binding

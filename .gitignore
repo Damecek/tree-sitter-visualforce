@@ -1,4 +1,5 @@
 node_modules/
+.visualforce-corpus.local.json
 .build/
 .cache/
 build/
@@ -9,4 +10,3 @@ target/
 *.wasm
 *.log
 .DS_Store
-

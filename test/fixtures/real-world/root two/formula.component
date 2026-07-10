@@ -1,0 +1,8 @@
+<apex:component>
+  <pre><code>IF (VALUE(X) > 0, IMAGE("/asset?id=Y", "*", 1, 1), "")
++
+IF (VALUE(X) > 1, IMAGE("/asset?id=Y", "*", 1, 1), "")</code></pre>
+  <script>after()</script>
+  <style>.after > .child { color: green; }</style>
+  <footer>After</footer>
+</apex:component>

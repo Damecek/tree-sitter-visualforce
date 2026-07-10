@@ -1,0 +1,17 @@
+{
+  "roots": [
+    {
+      "name": "project-one",
+      "path": "../project-one"
+    },
+    {
+      "name": "project-two",
+      "path": "../project-two"
+    }
+  ],
+  "reportPath": ".build/visualforce-corpus-report.json",
+  "baseline": {
+    "paths": 0,
+    "uniqueContents": 0
+  }
+}

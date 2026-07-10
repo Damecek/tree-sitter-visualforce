@@ -1,0 +1,17 @@
+{
+  "roots": [
+    {
+      "name": "first",
+      "path": "root one"
+    },
+    {
+      "name": "second",
+      "path": "root two"
+    }
+  ],
+  "reportPath": "../../../.build/real-world-harness-test-report.json",
+  "baseline": {
+    "paths": 3,
+    "uniqueContents": 2
+  }
+}
