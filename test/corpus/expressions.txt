@@ -126,3 +126,94 @@ Boolean and resource call
       (expression_end))
     (end_tag
       (tag_name))))
+
+==================
+Identifier string numeric and global subscripts
+==================
+
+<apex:page>{!map[key]} {!map['key']} {!rows[0]} {!map[$User.Id]}</apex:page>
+
+---
+
+(document
+  (element
+    (start_tag
+      (tag_name))
+    (visualforce_expression
+      (expression_start)
+      (subscript_expression
+        object: (identifier)
+        index: (identifier))
+      (expression_end))
+    (visualforce_expression
+      (expression_start)
+      (subscript_expression
+        object: (identifier)
+        index: (string_literal))
+      (expression_end))
+    (visualforce_expression
+      (expression_start)
+      (subscript_expression
+        object: (identifier)
+        index: (number_literal))
+      (expression_end))
+    (visualforce_expression
+      (expression_start)
+      (subscript_expression
+        object: (identifier)
+        index: (member_expression
+          object: (global_identifier)
+          property: (identifier)))
+      (expression_end))
+    (end_tag
+      (tag_name))))
+
+==================
+Members and calls compose with subscripts
+==================
+
+<apex:page>{!records[index].Name} {!factory()[key].value} {!handlers[key](record)} {!matrix[row][column]}</apex:page>
+
+---
+
+(document
+  (element
+    (start_tag
+      (tag_name))
+    (visualforce_expression
+      (expression_start)
+      (member_expression
+        object: (subscript_expression
+          object: (identifier)
+          index: (identifier))
+        property: (identifier))
+      (expression_end))
+    (visualforce_expression
+      (expression_start)
+      (member_expression
+        object: (subscript_expression
+          object: (call_expression
+            function: (identifier)
+            arguments: (argument_list))
+          index: (identifier))
+        property: (identifier))
+      (expression_end))
+    (visualforce_expression
+      (expression_start)
+      (call_expression
+        function: (subscript_expression
+          object: (identifier)
+          index: (identifier))
+        arguments: (argument_list
+          (identifier)))
+      (expression_end))
+    (visualforce_expression
+      (expression_start)
+      (subscript_expression
+        object: (subscript_expression
+          object: (identifier)
+          index: (identifier))
+        index: (identifier))
+      (expression_end))
+    (end_tag
+      (tag_name))))

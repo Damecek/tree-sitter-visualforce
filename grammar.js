@@ -20,6 +20,7 @@ const PREC = {
   UNARY: 8,
   CALL: 9,
   MEMBER: 10,
+  SUBSCRIPT: 10,
 };
 
 const binary = (precedence, operator) => ($) =>
@@ -39,6 +40,7 @@ module.exports = grammar(HTML, {
     original.concat([
       $._expression_end,
       $._missing_expression_end,
+      $._missing_subscript_end,
       $._missing_start_tag_end,
     ]),
 
@@ -71,7 +73,7 @@ module.exports = grammar(HTML, {
         $.end_tag,
       ),
 
-    text: (_) => /[^<>&{\s]([^<>&{]*[^<>&{\s])?/,
+    text: (_) => /[^<&{\s]([^<&{]*[^<&{\s])?/,
 
     attribute_value: ($) =>
       repeat1(
@@ -91,6 +93,7 @@ module.exports = grammar(HTML, {
             choice(
               $.visualforce_expression,
               $.entity,
+              alias(token.immediate('{'), $.attribute_text),
               alias(token.immediate(/[^'{&]+/), $.attribute_text),
             ),
           ),
@@ -102,6 +105,7 @@ module.exports = grammar(HTML, {
             choice(
               $.visualforce_expression,
               $.entity,
+              alias(token.immediate('{'), $.attribute_text),
               alias(token.immediate(/[^"{&]+/), $.attribute_text),
             ),
           ),
@@ -127,6 +131,7 @@ module.exports = grammar(HTML, {
         $.unary_expression,
         $.call_expression,
         $.member_expression,
+        $.subscript_expression,
         $.parenthesized_expression,
         $.global_identifier,
         $.identifier,
@@ -166,7 +171,10 @@ module.exports = grammar(HTML, {
       prec.left(
         PREC.CALL,
         seq(
-          field('function', choice($.identifier, $.member_expression)),
+          field(
+            'function',
+            choice($.identifier, $.member_expression, $.subscript_expression),
+          ),
           field('arguments', $.argument_list),
         ),
       ),
@@ -189,11 +197,33 @@ module.exports = grammar(HTML, {
               $.identifier,
               $.call_expression,
               $.member_expression,
+              $.subscript_expression,
               $.parenthesized_expression,
             ),
           ),
           '.',
           field('property', $.identifier),
+        ),
+      ),
+
+    subscript_expression: ($) =>
+      prec.left(
+        PREC.SUBSCRIPT,
+        seq(
+          field(
+            'object',
+            choice(
+              $.global_identifier,
+              $.identifier,
+              $.call_expression,
+              $.member_expression,
+              $.subscript_expression,
+              $.parenthesized_expression,
+            ),
+          ),
+          '[',
+          optional(field('index', $._expression)),
+          choice(']', $._missing_subscript_end),
         ),
       ),
 

@@ -122,3 +122,113 @@ JavaScript and style attributes with expressions
     (text)
     (end_tag
       (tag_name))))
+
+==================
+Message-format braces in quoted attributes
+==================
+
+<apex:page><apex:outputText value="{0,date,dd/MM/yyyy}"/><apex:outputText value="{0, date, dd.MM.yyyy}"/><footer>After</footer></apex:page>
+
+---
+
+(document
+  (element
+    (start_tag
+      (tag_name))
+    (element
+      (self_closing_tag
+        (tag_name)
+        (attribute
+          (attribute_name)
+          (quoted_attribute_value
+            (attribute_text)
+            (attribute_text)))))
+    (element
+      (self_closing_tag
+        (tag_name)
+        (attribute
+          (attribute_name)
+          (quoted_attribute_value
+            (attribute_text)
+            (attribute_text)))))
+    (element
+      (start_tag
+        (tag_name))
+      (text)
+      (end_tag
+        (tag_name)))
+    (end_tag
+      (tag_name))))
+
+==================
+Literal braces mixed with an expression and entity
+==================
+
+<apex:page><div title="prefix {0} &amp; {!record.Name} suffix {x}"></div><footer>After</footer></apex:page>
+
+---
+
+(document
+  (element
+    (start_tag
+      (tag_name))
+    (element
+      (start_tag
+        (tag_name)
+        (attribute
+          (attribute_name)
+          (quoted_attribute_value
+            (attribute_text)
+            (attribute_text)
+            (attribute_text)
+            (entity)
+            (attribute_text)
+            (visualforce_expression
+              (expression_start)
+              (member_expression
+                object: (identifier)
+                property: (identifier))
+              (expression_end))
+            (attribute_text)
+            (attribute_text)
+            (attribute_text))))
+      (end_tag
+        (tag_name)))
+    (element
+      (start_tag
+        (tag_name))
+      (text)
+      (end_tag
+        (tag_name)))
+    (end_tag
+      (tag_name))))
+
+==================
+Incomplete literal brace stays attribute text
+==================
+
+<apex:page><apex:outputText value="prefix {0,date"/><footer>After</footer></apex:page>
+
+---
+
+(document
+  (element
+    (start_tag
+      (tag_name))
+    (element
+      (self_closing_tag
+        (tag_name)
+        (attribute
+          (attribute_name)
+          (quoted_attribute_value
+            (attribute_text)
+            (attribute_text)
+            (attribute_text)))))
+    (element
+      (start_tag
+        (tag_name))
+      (text)
+      (end_tag
+        (tag_name)))
+    (end_tag
+      (tag_name))))

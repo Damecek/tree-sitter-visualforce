@@ -474,6 +474,18 @@
                     "content": {
                       "type": "IMMEDIATE_TOKEN",
                       "content": {
+                        "type": "STRING",
+                        "value": "{"
+                      }
+                    },
+                    "named": true,
+                    "value": "attribute_text"
+                  },
+                  {
+                    "type": "ALIAS",
+                    "content": {
+                      "type": "IMMEDIATE_TOKEN",
+                      "content": {
                         "type": "PATTERN",
                         "value": "[^'{&]+"
                       }
@@ -515,6 +527,18 @@
                     "content": {
                       "type": "IMMEDIATE_TOKEN",
                       "content": {
+                        "type": "STRING",
+                        "value": "{"
+                      }
+                    },
+                    "named": true,
+                    "value": "attribute_text"
+                  },
+                  {
+                    "type": "ALIAS",
+                    "content": {
+                      "type": "IMMEDIATE_TOKEN",
+                      "content": {
                         "type": "PATTERN",
                         "value": "[^\"{&]+"
                       }
@@ -535,7 +559,7 @@
     },
     "text": {
       "type": "PATTERN",
-      "value": "[^<>&{\\s]([^<>&{]*[^<>&{\\s])?"
+      "value": "[^<&{\\s]([^<&{]*[^<&{\\s])?"
     },
     "xml_declaration": {
       "type": "SEQ",
@@ -611,6 +635,10 @@
         {
           "type": "SYMBOL",
           "name": "member_expression"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "subscript_expression"
         },
         {
           "type": "SYMBOL",
@@ -1070,6 +1098,10 @@
                 {
                   "type": "SYMBOL",
                   "name": "member_expression"
+                },
+                {
+                  "type": "SYMBOL",
+                  "name": "subscript_expression"
                 }
               ]
             }
@@ -1161,6 +1193,10 @@
                 },
                 {
                   "type": "SYMBOL",
+                  "name": "subscript_expression"
+                },
+                {
+                  "type": "SYMBOL",
                   "name": "parenthesized_expression"
                 }
               ]
@@ -1177,6 +1213,81 @@
               "type": "SYMBOL",
               "name": "identifier"
             }
+          }
+        ]
+      }
+    },
+    "subscript_expression": {
+      "type": "PREC_LEFT",
+      "value": 10,
+      "content": {
+        "type": "SEQ",
+        "members": [
+          {
+            "type": "FIELD",
+            "name": "object",
+            "content": {
+              "type": "CHOICE",
+              "members": [
+                {
+                  "type": "SYMBOL",
+                  "name": "global_identifier"
+                },
+                {
+                  "type": "SYMBOL",
+                  "name": "identifier"
+                },
+                {
+                  "type": "SYMBOL",
+                  "name": "call_expression"
+                },
+                {
+                  "type": "SYMBOL",
+                  "name": "member_expression"
+                },
+                {
+                  "type": "SYMBOL",
+                  "name": "subscript_expression"
+                },
+                {
+                  "type": "SYMBOL",
+                  "name": "parenthesized_expression"
+                }
+              ]
+            }
+          },
+          {
+            "type": "STRING",
+            "value": "["
+          },
+          {
+            "type": "CHOICE",
+            "members": [
+              {
+                "type": "FIELD",
+                "name": "index",
+                "content": {
+                  "type": "SYMBOL",
+                  "name": "_expression"
+                }
+              },
+              {
+                "type": "BLANK"
+              }
+            ]
+          },
+          {
+            "type": "CHOICE",
+            "members": [
+              {
+                "type": "STRING",
+                "value": "]"
+              },
+              {
+                "type": "SYMBOL",
+                "name": "_missing_subscript_end"
+              }
+            ]
           }
         ]
       }
@@ -1314,6 +1425,10 @@
     {
       "type": "SYMBOL",
       "name": "_missing_expression_end"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "_missing_subscript_end"
     },
     {
       "type": "SYMBOL",

@@ -21,6 +21,7 @@ enum TokenType {
     COMMENT,
     EXPRESSION_END,
     MISSING_EXPRESSION_END,
+    MISSING_SUBSCRIPT_END,
     MISSING_START_TAG_END,
 };
 
@@ -324,6 +325,17 @@ static bool scan_self_closing_tag_delimiter(Scanner *scanner, TSLexer *lexer) {
 }
 
 static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
+    if (valid_symbols[MISSING_SUBSCRIPT_END]) {
+        while (iswspace(lexer->lookahead)) {
+            skip(lexer);
+        }
+
+        if (lexer->eof(lexer)) {
+            lexer->result_symbol = MISSING_SUBSCRIPT_END;
+            return true;
+        }
+    }
+
     if (valid_symbols[MISSING_START_TAG_END]) {
         while (iswspace(lexer->lookahead)) {
             skip(lexer);

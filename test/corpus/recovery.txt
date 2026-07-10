@@ -145,3 +145,20 @@ Mismatched tag recovers to a later sibling
         (tag_name)))
     (end_tag
       (tag_name))))
+
+==================
+Incomplete subscript remains structured
+==================
+
+<apex:page>{!map[
+
+---
+
+(document
+  (element
+    (start_tag
+      (tag_name))
+    (visualforce_expression
+      (expression_start)
+      (subscript_expression
+        object: (identifier)))))
