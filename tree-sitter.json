@@ -1,0 +1,43 @@
+{
+  "$schema": "https://tree-sitter.github.io/tree-sitter/assets/schemas/config.schema.json",
+  "grammars": [
+    {
+      "name": "visualforce",
+      "camelcase": "Visualforce",
+      "title": "Visualforce",
+      "scope": "source.visualforce",
+      "file-types": [
+        "component",
+        "page"
+      ],
+      "injection-regex": "^visualforce$",
+      "class-name": "TreeSitterVisualforce"
+    }
+  ],
+  "metadata": {
+    "version": "0.1.0",
+    "license": "MIT",
+    "description": "Salesforce Visualforce grammar for Tree-sitter",
+    "authors": [
+      {
+        "name": "Adam Stepanek",
+        "email": "Damecek@users.noreply.github.com",
+        "url": "https://github.com/Damecek"
+      }
+    ],
+    "links": {
+      "repository": "https://github.com/Damecek/tree-sitter-visualforce",
+      "funding": ""
+    }
+  },
+  "bindings": {
+    "c": true,
+    "go": true,
+    "java": false,
+    "node": true,
+    "python": true,
+    "rust": true,
+    "swift": true,
+    "zig": false
+  }
+}
