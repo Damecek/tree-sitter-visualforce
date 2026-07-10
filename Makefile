@@ -1,6 +1,6 @@
 LANGUAGE_NAME := tree-sitter-visualforce
 HOMEPAGE_URL := https://github.com/damecek/tree-sitter-visualforce
-VERSION := 0.1.0
+VERSION := 0.1.1
 DESCRIPTION := Salesforce Visualforce grammar for Tree-sitter
 
 # repository

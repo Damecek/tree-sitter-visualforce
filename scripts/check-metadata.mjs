@@ -6,7 +6,7 @@ const packageJson = readJson('package.json');
 const treeSitterJson = readJson('tree-sitter.json');
 
 assert.equal(packageJson.name, 'tree-sitter-visualforce');
-assert.equal(packageJson.version, '0.1.0');
+assert.equal(packageJson.version, '0.1.1');
 assert.equal(packageJson.license, 'MIT');
 assert.equal(packageJson.devDependencies['tree-sitter-cli'], '0.26.10');
 assert.equal(packageJson.devDependencies['tree-sitter-html'], '0.23.2');

@@ -1,6 +1,6 @@
 {
   "name": "tree-sitter-visualforce",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Visualforce grammar for Tree-sitter",
   "repository": "https://github.com/Damecek/tree-sitter-visualforce",
   "license": "MIT",
