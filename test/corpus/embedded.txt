@@ -1,0 +1,211 @@
+==================
+JavaScript without Visualforce expressions
+==================
+
+<apex:page><script>const total = rows.length > 0 ? rows[0].value : 0;</script><p>After</p></apex:page>
+
+---
+
+(document
+  (element
+    (start_tag
+      (tag_name))
+    (script_element
+      (start_tag
+        (tag_name))
+      (raw_text)
+      (end_tag
+        (tag_name)))
+    (element
+      (start_tag
+        (tag_name))
+      (text)
+      (end_tag
+        (tag_name)))
+    (end_tag
+      (tag_name))))
+
+==================
+JavaScript with encoded expression
+==================
+
+<apex:page><script>const name = '{!JSENCODE(account.Name)}'; const id = '{!record.Id}';</script></apex:page>
+
+---
+
+(document
+  (element
+    (start_tag
+      (tag_name))
+    (script_element
+      (start_tag
+        (tag_name))
+      (raw_text)
+      (visualforce_expression
+        (expression_start)
+        (call_expression
+          function: (identifier)
+          arguments: (argument_list
+            (member_expression
+              object: (identifier)
+              property: (identifier))))
+        (expression_end))
+      (raw_text)
+      (visualforce_expression
+        (expression_start)
+        (member_expression
+          object: (identifier)
+          property: (identifier))
+        (expression_end))
+      (raw_text)
+      (end_tag
+        (tag_name)))
+    (end_tag
+      (tag_name))))
+
+==================
+JavaScript comparison expression does not close markup
+==================
+
+<apex:page><script>window.ok = {!score < 10 OR score >= 20};</script><apex:outputText value="after"/></apex:page>
+
+---
+
+(document
+  (element
+    (start_tag
+      (tag_name))
+    (script_element
+      (start_tag
+        (tag_name))
+      (raw_text)
+      (visualforce_expression
+        (expression_start)
+        (binary_expression
+          left: (binary_expression
+            left: (identifier)
+            operator: (operator)
+            right: (number_literal))
+          operator: (operator)
+          right: (binary_expression
+            left: (identifier)
+            operator: (operator)
+            right: (number_literal)))
+        (expression_end))
+      (raw_text)
+      (end_tag
+        (tag_name)))
+    (element
+      (self_closing_tag
+        (tag_name)
+        (attribute
+          (attribute_name)
+          (quoted_attribute_value
+            (attribute_text)))))
+    (end_tag
+      (tag_name))))
+
+==================
+CSS without Visualforce expressions
+==================
+
+<apex:page><style>.card > .title { color: red; }</style><div>After</div></apex:page>
+
+---
+
+(document
+  (element
+    (start_tag
+      (tag_name))
+    (style_element
+      (start_tag
+        (tag_name))
+      (raw_text)
+      (end_tag
+        (tag_name)))
+    (element
+      (start_tag
+        (tag_name))
+      (text)
+      (end_tag
+        (tag_name)))
+    (end_tag
+      (tag_name))))
+
+==================
+CSS with Visualforce expressions
+==================
+
+<apex:page><style>.brand { color: {!theme.primary}; background: url('{!URLFOR($Resource.assets, "bg{2}.png")}'); }</style></apex:page>
+
+---
+
+(document
+  (element
+    (start_tag
+      (tag_name))
+    (style_element
+      (start_tag
+        (tag_name))
+      (raw_text)
+      (visualforce_expression
+        (expression_start)
+        (member_expression
+          object: (identifier)
+          property: (identifier))
+        (expression_end))
+      (raw_text)
+      (visualforce_expression
+        (expression_start)
+        (call_expression
+          function: (identifier)
+          arguments: (argument_list
+            (member_expression
+              object: (global_identifier)
+              property: (identifier))
+            (string_literal)))
+        (expression_end))
+      (raw_text)
+      (end_tag
+        (tag_name)))
+    (end_tag
+      (tag_name))))
+
+==================
+Case-insensitive closing tags preserve following markup
+==================
+
+<apex:page><SCRIPT>{!value}</SCRIPT><STYLE>{!color}</STYLE><footer>Done</footer></apex:page>
+
+---
+
+(document
+  (element
+    (start_tag
+      (tag_name))
+    (script_element
+      (start_tag
+        (tag_name))
+      (visualforce_expression
+        (expression_start)
+        (identifier)
+        (expression_end))
+      (end_tag
+        (tag_name)))
+    (style_element
+      (start_tag
+        (tag_name))
+      (visualforce_expression
+        (expression_start)
+        (identifier)
+        (expression_end))
+      (end_tag
+        (tag_name)))
+    (element
+      (start_tag
+        (tag_name))
+      (text)
+      (end_tag
+        (tag_name)))
+    (end_tag
+      (tag_name))))

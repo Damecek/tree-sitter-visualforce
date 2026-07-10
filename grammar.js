@@ -35,12 +35,41 @@ const binary = (precedence, operator) => $ =>
 module.exports = grammar(HTML, {
   name: 'visualforce',
 
+  externals: ($, original) =>
+    original.concat([
+      $._expression_end,
+      $._missing_expression_end,
+      $._missing_start_tag_end,
+    ]),
+
   rules: {
     document: $ => repeat(choice($.xml_declaration, $._node)),
 
     xml_declaration: $ => seq('<?xml', repeat($.attribute), '?>'),
 
     _node: ($, original) => choice(prec(1, $.visualforce_expression), original),
+
+    start_tag: $ =>
+      seq(
+        '<',
+        alias($._start_tag_name, $.tag_name),
+        repeat($.attribute),
+        choice('>', $._missing_start_tag_end),
+      ),
+
+    script_element: $ =>
+      seq(
+        alias($.script_start_tag, $.start_tag),
+        repeat(choice($.raw_text, $.visualforce_expression)),
+        $.end_tag,
+      ),
+
+    style_element: $ =>
+      seq(
+        alias($.style_start_tag, $.start_tag),
+        repeat(choice($.raw_text, $.visualforce_expression)),
+        $.end_tag,
+      ),
 
     text: _ => /[^<>&{\s]([^<>&{]*[^<>&{\s])?/,
 
@@ -86,7 +115,10 @@ module.exports = grammar(HTML, {
       seq(
         alias('{!', $.expression_start),
         $._expression,
-        alias('}', $.expression_end),
+        choice(
+          alias($._expression_end, $.expression_end),
+          $._missing_expression_end,
+        ),
       ),
 
     _expression: $ =>

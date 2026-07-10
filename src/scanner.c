@@ -19,6 +19,9 @@ enum TokenType {
     IMPLICIT_END_TAG,
     RAW_TEXT,
     COMMENT,
+    EXPRESSION_END,
+    MISSING_EXPRESSION_END,
+    MISSING_START_TAG_END,
 };
 
 typedef struct {
@@ -156,7 +159,24 @@ static bool scan_raw_text(Scanner *scanner, TSLexer *lexer) {
     const char *end_delimiter = array_back(&scanner->tags)->type == SCRIPT ? "</SCRIPT" : "</STYLE";
 
     unsigned delimiter_index = 0;
+    bool has_content = false;
     while (lexer->lookahead) {
+        if (lexer->lookahead == '{') {
+            advance(lexer);
+            if (lexer->lookahead == '!') {
+                if (!has_content) {
+                    return false;
+                }
+                lexer->result_symbol = RAW_TEXT;
+                return true;
+            }
+
+            delimiter_index = 0;
+            has_content = true;
+            lexer->mark_end(lexer);
+            continue;
+        }
+
         if (towupper(lexer->lookahead) == end_delimiter[delimiter_index]) {
             delimiter_index++;
             if (delimiter_index == strlen(end_delimiter)) {
@@ -166,8 +186,13 @@ static bool scan_raw_text(Scanner *scanner, TSLexer *lexer) {
         } else {
             delimiter_index = 0;
             advance(lexer);
+            has_content = true;
             lexer->mark_end(lexer);
         }
+    }
+
+    if (!has_content) {
+        return false;
     }
 
     lexer->result_symbol = RAW_TEXT;
@@ -181,6 +206,12 @@ static void pop_tag(Scanner *scanner) {
 
 static bool scan_implicit_end_tag(Scanner *scanner, TSLexer *lexer) {
     Tag *parent = scanner->tags.size == 0 ? NULL : array_back(&scanner->tags);
+
+    if (parent && lexer->eof(lexer)) {
+        pop_tag(scanner);
+        lexer->result_symbol = IMPLICIT_END_TAG;
+        return true;
+    }
 
     bool is_closing_tag = false;
     if (lexer->lookahead == '/') {
@@ -293,6 +324,34 @@ static bool scan_self_closing_tag_delimiter(Scanner *scanner, TSLexer *lexer) {
 }
 
 static bool scan(Scanner *scanner, TSLexer *lexer, const bool *valid_symbols) {
+    if (valid_symbols[MISSING_START_TAG_END]) {
+        while (iswspace(lexer->lookahead)) {
+            skip(lexer);
+        }
+
+        if (lexer->eof(lexer)) {
+            lexer->result_symbol = MISSING_START_TAG_END;
+            return true;
+        }
+    }
+
+    if (valid_symbols[EXPRESSION_END] || valid_symbols[MISSING_EXPRESSION_END]) {
+        while (iswspace(lexer->lookahead)) {
+            skip(lexer);
+        }
+
+        if (valid_symbols[EXPRESSION_END] && lexer->lookahead == '}') {
+            advance(lexer);
+            lexer->result_symbol = EXPRESSION_END;
+            return true;
+        }
+
+        if (valid_symbols[MISSING_EXPRESSION_END] && lexer->eof(lexer)) {
+            lexer->result_symbol = MISSING_EXPRESSION_END;
+            return true;
+        }
+    }
+
     if (valid_symbols[RAW_TEXT] && !valid_symbols[START_TAG_NAME] && !valid_symbols[END_TAG_NAME]) {
         return scan_raw_text(scanner, lexer);
     }
@@ -366,4 +425,3 @@ void tree_sitter_visualforce_external_scanner_destroy(void *payload) {
     array_delete(&scanner->tags);
     ts_free(scanner);
 }
-
