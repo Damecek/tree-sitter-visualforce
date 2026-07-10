@@ -1,0 +1,124 @@
+==================
+Expression-only attribute value
+==================
+
+<apex:outputText value="{!account.Name}"/>
+
+---
+
+(document
+  (element
+    (self_closing_tag
+      (tag_name)
+      (attribute
+        (attribute_name)
+        (quoted_attribute_value
+          (visualforce_expression
+            (expression_start)
+            (member_expression
+              object: (identifier)
+              property: (identifier))
+            (expression_end)))))))
+
+==================
+Mixed literal and expression attribute
+==================
+
+<div title="Account {!HTMLENCODE(account.Name)} — {!$User.FirstName}"></div>
+
+---
+
+(document
+  (element
+    (start_tag
+      (tag_name)
+      (attribute
+        (attribute_name)
+        (quoted_attribute_value
+          (attribute_text)
+          (visualforce_expression
+            (expression_start)
+            (call_expression
+              function: (identifier)
+              arguments: (argument_list
+                (member_expression
+                  object: (identifier)
+                  property: (identifier))))
+            (expression_end))
+          (attribute_text)
+          (visualforce_expression
+            (expression_start)
+            (member_expression
+              object: (global_identifier)
+              property: (identifier))
+            (expression_end)))))
+    (end_tag
+      (tag_name))))
+
+==================
+Unquoted expression and literal attributes
+==================
+
+<c:badge rendered={!score>=10} state=active/>
+
+---
+
+(document
+  (element
+    (self_closing_tag
+      (tag_name)
+      (attribute
+        (attribute_name)
+        (attribute_value
+          (visualforce_expression
+            (expression_start)
+            (binary_expression
+              left: (identifier)
+              operator: (operator)
+              right: (number_literal))
+            (expression_end))))
+      (attribute
+        (attribute_name)
+        (attribute_value
+          (attribute_text))))))
+
+==================
+JavaScript and style attributes with expressions
+==================
+
+<button onclick="save('{!JSENCODE(record.Id)}')" style='color: {!theme.color};'>Save</button>
+
+---
+
+(document
+  (element
+    (start_tag
+      (tag_name)
+      (attribute
+        (attribute_name)
+        (quoted_attribute_value
+          (attribute_text)
+          (visualforce_expression
+            (expression_start)
+            (call_expression
+              function: (identifier)
+              arguments: (argument_list
+                (member_expression
+                  object: (identifier)
+                  property: (identifier))))
+            (expression_end))
+          (attribute_text)))
+      (attribute
+        (attribute_name)
+        (quoted_attribute_value
+          (attribute_text)
+          (visualforce_expression
+            (expression_start)
+            (member_expression
+              object: (identifier)
+              property: (identifier))
+            (expression_end))
+          (attribute_text))))
+    (text)
+    (end_tag
+      (tag_name))))

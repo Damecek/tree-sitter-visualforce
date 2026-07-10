@@ -1,0 +1,128 @@
+==================
+Global variable and chained properties
+==================
+
+<apex:page>Hello {!$User.Contact.Account.Name}</apex:page>
+
+---
+
+(document
+  (element
+    (start_tag
+      (tag_name))
+    (text)
+    (visualforce_expression
+      (expression_start)
+      (member_expression
+        object: (member_expression
+          object: (member_expression
+            object: (global_identifier)
+            property: (identifier))
+          property: (identifier))
+        property: (identifier))
+      (expression_end))
+    (end_tag
+      (tag_name))))
+
+==================
+Nested formula-style calls
+==================
+
+<apex:page>{!IF(active, HTMLENCODE(account.Name), URLFOR($Resource.assets, 'icons/a,b).svg'))}</apex:page>
+
+---
+
+(document
+  (element
+    (start_tag
+      (tag_name))
+    (visualforce_expression
+      (expression_start)
+      (call_expression
+        function: (identifier)
+        arguments: (argument_list
+          (identifier)
+          (call_expression
+            function: (identifier)
+            arguments: (argument_list
+              (member_expression
+                object: (identifier)
+                property: (identifier))))
+          (call_expression
+            function: (identifier)
+            arguments: (argument_list
+              (member_expression
+                object: (global_identifier)
+                property: (identifier))
+              (string_literal)))))
+      (expression_end))
+    (end_tag
+      (tag_name))))
+
+==================
+Literals unary and binary operators
+==================
+
+<apex:page>{!NOT disabled AND (amount >= -12.50 OR value = null) & "ok\"{brace}"}</apex:page>
+
+---
+
+(document
+  (element
+    (start_tag
+      (tag_name))
+    (visualforce_expression
+      (expression_start)
+      (binary_expression
+        left: (unary_expression
+          operator: (operator)
+          argument: (identifier))
+        operator: (operator)
+        right: (binary_expression
+          left: (parenthesized_expression
+            (binary_expression
+              left: (binary_expression
+                left: (identifier)
+                operator: (operator)
+                right: (unary_expression
+                  operator: (operator)
+                  argument: (number_literal)))
+              operator: (operator)
+              right: (binary_expression
+                left: (identifier)
+                operator: (operator)
+                right: (null_literal))))
+          operator: (operator)
+          right: (string_literal)))
+      (expression_end))
+    (end_tag
+      (tag_name))))
+
+==================
+Boolean and resource call
+==================
+
+<apex:page>{!JSENCODE(URLFOR($Resource.app, 'main.js', true))}</apex:page>
+
+---
+
+(document
+  (element
+    (start_tag
+      (tag_name))
+    (visualforce_expression
+      (expression_start)
+      (call_expression
+        function: (identifier)
+        arguments: (argument_list
+          (call_expression
+            function: (identifier)
+            arguments: (argument_list
+              (member_expression
+                object: (global_identifier)
+                property: (identifier))
+              (string_literal)
+              (boolean_literal)))))
+      (expression_end))
+    (end_tag
+      (tag_name))))
