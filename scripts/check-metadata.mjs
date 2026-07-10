@@ -29,6 +29,12 @@ for (const path of [
   'queries/injections.scm',
   'queries/indents.scm',
   'queries/folds.scm',
+  'README.md',
+  'CONTRIBUTING.md',
+  'AGENTS.md',
+  'LICENSE',
+  'THIRD_PARTY_NOTICES.md',
+  '.github/workflows/ci.yml',
 ]) {
   assert.ok(existsSync(path), `${path} must be committed`);
 }
